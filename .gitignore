@@ -1,0 +1,3 @@
+# Paquetes generados por tizen-build.ps1
+dist/
+*.wgt

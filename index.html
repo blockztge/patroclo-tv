@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Canales en vivo de todo el mundo, estrenos y clásicos en tu Smart TV, todo con el control remoto.">
+  <title>Patroclo TV</title>
+  <link rel="stylesheet" href="css/app.css?v=1.0.7">
+  <script>
+    // API de Samsung (AVPlay): solo existe dentro del televisor.
+    if (window.tizen) document.write('<script src="$WEBAPIS/webapis/webapis.js"><\/script>');
+  </script>
+</head>
+<body>
+  <div id="stage">
+    <div id="app">
+      <section id="setup" class="screen hidden"></section>
+      <section id="shell" class="screen hidden">
+        <header id="topbar">
+          <div class="brand"><span class="accent">Patroclo</span> TV</div>
+          <nav id="tabs"></nav>
+          <div id="clock"></div>
+        </header>
+        <main id="content"></main>
+      </section>
+    </div>
+    <div id="modal" class="layer hidden"></div>
+    <div id="player" class="layer hidden"></div>
+    <div id="loading" class="layer hidden">
+      <div class="spinner"></div>
+      <div id="loading-text"></div>
+    </div>
+    <div id="toast" class="hidden"></div>
+  </div>
+
+  <script src="js/core.js?v=1.0.7"></script>
+  <script src="js/sources.js?v=1.0.7"></script>
+  <script src="js/nav.js?v=1.0.7"></script>
+  <script src="js/player.js?v=1.0.7"></script>
+  <script src="js/app.js?v=1.0.7"></script>
+</body>
+</html>

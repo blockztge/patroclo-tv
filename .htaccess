@@ -1,0 +1,7 @@
+# Solo para probar en XAMPP: que el navegador siempre pida la última versión
+# de la app. No se incluye en el paquete para el televisor.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|js|css|json|m3u)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
