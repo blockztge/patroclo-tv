@@ -41,6 +41,19 @@ hacen de control remoto; `F` = favorito, `G` = otra señal, `I` = información.
 En el navegador muchos canales no cargan porque sus servidores bloquean páginas web (CORS). `proxy.php`
 resuelve la carga de listas y de Xtream, pero no el video. En el televisor no existe esa restricción.
 
+## En línea las 24 horas (GitHub Pages)
+
+La app está publicada en <https://blockztge.github.io/patroclo-tv/>.
+
+- `tizen-build.ps1 -Online` instala en el televisor **Patroclo TV**, un lanzador que carga la app desde
+  esa dirección. Funciona aunque la PC esté apagada.
+- Para publicar cambios: `.\publicar.ps1` (o `.\publicar.ps1 "qué cambié"`). Sube los archivos a GitHub
+  y escribe `version.txt`. En uno o dos minutos el cambio está en línea y el televisor, que revisa
+  `version.txt` cada 30 segundos, se recarga solo (si hay un canal en pantalla, espera a que se cierre).
+- En línea no hay PHP: `proxy.php` y `dev-version.php` no funcionan ahí. El televisor no los necesita.
+- Abierta desde el navegador de una PC (https), muchos canales `http://` no cargan por seguridad del
+  navegador. En el televisor no pasa.
+
 ## Desarrollar con la TV actualizándose sola
 
 `tizen-build.ps1 -Dev` instala en el televisor **Patroclo TV (dev)**, un lanzador que carga la app
