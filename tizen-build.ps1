@@ -28,20 +28,27 @@ $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
 $dist = Join-Path $root "dist"
 
-# Buscar la CLI de Tizen (tizen.bat) y sdb.
+# Buscar la CLI de Tizen (tizen.bat) y sdb: sirve tanto para Tizen Studio
+# (C:\tizen-studio\tools) como para la extensión de VS Code
+# (C:\tizen-studio\server\sdktools\data\tools).
 $tizen = (Get-Command tizen.bat -ErrorAction SilentlyContinue)
 if ($tizen) { $tizen = $tizen.Source }
 else {
     foreach ($dir in @("C:\tizen-studio", "$env:USERPROFILE\tizen-studio", "D:\tizen-studio")) {
-        $candidate = Join-Path $dir "tools\ide\bin\tizen.bat"
-        if (Test-Path $candidate) { $tizen = $candidate; break }
+        foreach ($sub in @("server\sdktools\data\tools", "tools")) {
+            $candidate = Join-Path $dir "$sub\ide\bin\tizen.bat"
+            if (Test-Path $candidate) { $tizen = $candidate; break }
+        }
+        if ($tizen) { break }
     }
 }
 if (-not $tizen) {
-    Write-Host "No se encontró Tizen Studio. Instalalo desde https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/installing-tv-sdk.html" -ForegroundColor Red
+    Write-Host "No se encontró la CLI de Tizen. En VS Code: Ctrl+Shift+P > 'Tizen: Install Tizen CLI'." -ForegroundColor Red
     exit 1
 }
+# tizen.bat está en ...\tools\ide\bin y sdb.exe en ...\tools
 $sdb = Join-Path (Split-Path (Split-Path (Split-Path $tizen))) "sdb.exe"
+if (-not (Test-Path $sdb)) { Write-Host "No se encontró sdb.exe junto a $tizen" -ForegroundColor Red; exit 1 }
 
 if (Test-Path $dist) { Remove-Item -Recurse -Force $dist }
 

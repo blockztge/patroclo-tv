@@ -1,3 +1,9 @@
 # Paquetes generados por tizen-build.ps1
 dist/
 *.wgt
+
+# Archivos de la extensión de Tizen para VS Code (no son parte de la app)
+.vscode/
+data/server/
+data/extension-storage/
+data/selected-server.json
