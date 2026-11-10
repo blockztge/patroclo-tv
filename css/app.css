@@ -41,6 +41,7 @@ input { font: inherit; outline: none; }
 }
 .k-white { background: #e4e4e7; }
 .k-green { background: #22c55e; }
+.k-blue { background: #3b82f6; }
 .k-yellow { background: #facc15; }
 .empty { padding: 30px 10px; font-size: 26px; color: rgba(255, 255, 255, .55); white-space: normal; line-height: 1.4; }
 

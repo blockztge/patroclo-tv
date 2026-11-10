@@ -16,7 +16,7 @@
   var POS_KEY = 'ptv_pos';
 
   var HINT_LIVE = '<span class="key k-white">▲▼</span>Cambiar canal &nbsp; <span class="key k-white">0-9</span>Ir al número &nbsp; ' +
-    '<span class="key k-green">&nbsp;</span>Otra señal &nbsp; <span class="key k-yellow">&nbsp;</span>Favorito &nbsp; <span class="key k-white">Volver</span>Salir';
+    '<span class="key k-green">&nbsp;</span>Otra señal &nbsp; <span class="key k-yellow">&nbsp;</span>Favorito &nbsp; <span class="key k-blue">&nbsp;</span>Formato &nbsp; <span class="key k-white">Volver</span>Salir';
   var HINT_VOD = '<span class="key k-white">OK</span>Pausa &nbsp; <span class="key k-white">◀▶</span>10 seg &nbsp; ' +
     '<span class="key k-white">REW FF</span>30 seg &nbsp; <span class="key k-yellow">&nbsp;</span>Favorito &nbsp; <span class="key k-white">Volver</span>Salir';
 
@@ -43,7 +43,7 @@
       try {
         a.open(url);
         a.setDisplayRect(0, 0, window.innerWidth, window.innerHeight);
-        try { a.setDisplayMethod('PLAYER_DISPLAY_MODE_LETTER_BOX'); } catch (e1) {}
+        applyAspect();
         if (it.ua) { try { a.setStreamingProperty('USER_AGENT', it.ua); } catch (e2) {} }
         a.setListener({
           onbufferingstart: function () { cb.buffering(true); },
@@ -85,6 +85,30 @@
     seek: function (sec) { try { window.webapis.avplay.seekTo(Math.max(0, sec) * 1000); } catch (e) {} }
   };
 
+  // Formato de imagen. Los canales en vivo ocupan toda la pantalla: muchas
+  // señales HD vienen en 1280x1080 o 1440x1080 y esperan que el televisor las
+  // estire a 16:9. Las películas respetan su proporción (hay muchas en 4:3).
+  // El botón azul alterna entre los dos modos en los canales en vivo.
+  function fillScreen() {
+    return isLive() && P.settings.aspect !== 'fit';
+  }
+
+  function applyAspect() {
+    var fill = fillScreen();
+    if (video) video.style.objectFit = fill ? 'fill' : 'contain';
+    if (st.engine === 'avplay' || (P.hasAVPlay() && avEl && avEl.style.display === 'block')) {
+      try { window.webapis.avplay.setDisplayMethod(fill ? 'PLAYER_DISPLAY_MODE_FULL_SCREEN' : 'PLAYER_DISPLAY_MODE_LETTER_BOX'); } catch (e) {}
+    }
+  }
+
+  function toggleAspect() {
+    if (!isLive()) return P.toast('En las películas se respeta la proporción original');
+    P.settings.aspect = P.settings.aspect === 'fit' ? 'full' : 'fit';
+    P.store.set('ptv_settings', P.settings);
+    applyAspect();
+    P.toast(P.settings.aspect === 'fit' ? 'Formato: proporción original' : 'Formato: pantalla completa');
+  }
+
   function playVideo() {
     var p = video.play();
     if (p && p.catch) p.catch(function () {});
@@ -101,6 +125,7 @@
   engines.html5 = {
     start: function (url, it, cb) {
       video.style.display = 'block';
+      applyAspect();
       // En la PC se prefiere hls.js aunque el navegador traiga HLS propio:
       // el de Chrome a veces se queda trabado sin avisar ningún error.
       var nativeHls = !!video.canPlayType('application/vnd.apple.mpegurl');
@@ -553,6 +578,7 @@
       case K.GREEN: case 71: switchMirror(); break;
       case K.YELLOW: case 70: P.toggleFav(st.list ? st.list[st.index] : st.item); renderOsd(); showOsd(); break;
       case K.INFO: case 73: toggleOsd(); break;
+      case K.BLUE: case 66: toggleAspect(); break;
     }
   }
 

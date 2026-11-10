@@ -805,7 +805,7 @@
       help.innerHTML = '<h3>Control remoto</h3>' +
         '<p><span class="key k-white">▲▼◀▶</span>Moverse &nbsp; <span class="key k-white">OK</span>Elegir &nbsp; <span class="key k-white">Volver</span>Atrás</p>' +
         '<p>En un canal: <span class="key k-white">▲▼ / CH</span>Cambiar canal &nbsp; <span class="key k-white">0-9</span>Ir al número &nbsp; ' +
-        '<span class="key k-green">&nbsp;</span>Otra señal &nbsp; <span class="key k-yellow">&nbsp;</span>Favorito &nbsp; <span class="key k-white">Info</span>Datos</p>' +
+        '<span class="key k-green">&nbsp;</span>Otra señal &nbsp; <span class="key k-yellow">&nbsp;</span>Favorito &nbsp; <span class="key k-blue">&nbsp;</span>Formato de imagen &nbsp; <span class="key k-white">Info</span>Datos</p>' +
         '<p>En una película: <span class="key k-white">OK / Play</span>Pausa &nbsp; <span class="key k-white">◀▶</span>10 seg &nbsp; <span class="key k-white">REW FF</span>30 seg</p>';
       w.appendChild(help);
       w.appendChild(P.el('p', 'version', 'Patroclo TV ' + P.VERSION + (P.isTizen ? ' · Samsung Tizen' : ' · Navegador')));
