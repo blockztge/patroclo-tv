@@ -6,7 +6,7 @@ var PTV = window.PTV = window.PTV || {};
 (function (P) {
   'use strict';
 
-  P.VERSION = '1.0.7';
+  P.VERSION = '1.0.8';
   P.isTizen = typeof window.tizen !== 'undefined';
   P.W = 1920;
   P.H = 1080;

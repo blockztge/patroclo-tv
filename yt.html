@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Patroclo TV · YouTube</title>
+  <!-- Página intermedia para los canales de YouTube. YouTube no deja que lo
+       inserte una página sin dirección web, como la app instalada en la TV;
+       la app abre esta página (publicada en internet) y esta abre YouTube.
+       Uso: yt.html?channel=UC...  o  yt.html?v=ID_DEL_VIDEO -->
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+    iframe { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0; }
+  </style>
+</head>
+<body>
+  <script>
+    (function () {
+      var params = {}, pairs = location.search.replace(/^\?/, '').split('&');
+      for (var i = 0; i < pairs.length; i++) {
+        var kv = pairs[i].split('=');
+        if (kv[0]) params[kv[0]] = decodeURIComponent(kv[1] || '');
+      }
+      var opts = 'autoplay=1&controls=0&rel=0&modestbranding=1&playsinline=1';
+      var src;
+      if (/^[\w-]{11}$/.test(params.v || '')) src = 'https://www.youtube.com/embed/' + params.v + '?' + opts;
+      else if (/^UC[\w-]{22}$/.test(params.channel || '')) src = 'https://www.youtube.com/embed/live_stream?channel=' + params.channel + '&' + opts;
+      else return;
+      var f = document.createElement('iframe');
+      f.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
+      f.setAttribute('allowfullscreen', '');
+      f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      f.src = src;
+      document.body.appendChild(f);
+    })();
+  </script>
+</body>
+</html>

@@ -11,7 +11,7 @@
   var st = {
     open: false, list: null, index: 0, item: null, token: 0, engine: null, cbs: null,
     mirrors: [], tried: {}, started: false, paused: false, cur: 0, dur: 0,
-    onClose: null, hls: null, numBuf: '', lastMove: 0
+    onClose: null, hls: null, numBuf: '', lastMove: 0, retried: {}
   };
   var POS_KEY = 'ptv_pos';
 
@@ -151,6 +151,14 @@
     seek: function (sec) { try { video.currentTime = Math.max(0, sec); } catch (e) {} }
   };
 
+  // YouTube rechaza que lo inserte una página sin dirección web (la app
+  // instalada en la TV corre como archivo local): se lo abre a través de
+  // yt.html, publicada en internet junto con la app.
+  var YT_ONLINE = 'https://blockztge.github.io/patroclo-tv/yt.html';
+  function ytPage() {
+    return /^https?:/i.test(document.baseURI || location.href) ? 'yt.html' : YT_ONLINE;
+  }
+
   // Señales de YouTube en vivo (algunos canales argentinos solo emiten ahí).
   engines.youtube = {
     start: function (url, it, cb) {
@@ -158,9 +166,7 @@
       frame.setAttribute('frameborder', '0');
       frame.setAttribute('allow', 'autoplay; encrypted-media');
       frame.onload = function () { cb.playing(); };
-      frame.src = it.ytVideo
-        ? 'https://www.youtube.com/embed/' + encodeURIComponent(it.ytVideo) + '?autoplay=1&controls=0&rel=0&modestbranding=1'
-        : 'https://www.youtube.com/embed/live_stream?channel=' + encodeURIComponent(it.ytId) + '&autoplay=1&controls=0&rel=0&modestbranding=1';
+      frame.src = ytPage() + (it.ytVideo ? '?v=' + encodeURIComponent(it.ytVideo) : '?channel=' + encodeURIComponent(it.ytId));
       layer.insertBefore(frame, ui.osd);
     },
     stop: function () {
@@ -259,6 +265,14 @@
     if (!keepMirrors) {
       st.mirrors = P.mirrorsOf(it);
       st.tried = {};
+      st.retried = {};
+      // AVPlay no puede mandar el "referer" que piden algunas señales: si el
+      // canal tiene otra señal, se empieza por esa.
+      if (it.ref && pickEngine(it) === 'avplay') {
+        for (var m = 0; m < st.mirrors.length; m++) {
+          if (!st.mirrors[m].ref && pickEngine(st.mirrors[m]) === 'avplay') { it = st.item = st.mirrors[m]; break; }
+        }
+      }
     }
     st.tried[it.url] = true;
     hideError();
@@ -274,7 +288,7 @@
       st.engine = name;
       st.cbs = cb;
       T('start', function () {
-        if (tk === st.token && !st.started) fail('La señal no responde');
+        if (tk === st.token && !st.started) fail('La señal no responde', true);
       }, 25000);
       engines[name].start(url, it, cb);
     });
@@ -285,8 +299,18 @@
     return null;
   }
 
-  function fail(msg) {
+  function fail(msg, noRetry) {
     T('start');
+    // AVPlay a veces rechaza una señal que anda si se abre enseguida después
+    // de otra: se reintenta una vez antes de pasar a otra señal.
+    var it = st.item;
+    if (!noRetry && st.engine === 'avplay' && it && !it.ref && !st.retried[it.url]) {
+      st.retried[it.url] = true;
+      var tk = st.token;
+      stopEngine();
+      T('retry', function () { if (tk === st.token && st.open) start(it, true); }, 1000);
+      return;
+    }
     if (isLive()) {
       var next = nextUntried();
       if (next) {
